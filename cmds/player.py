@@ -15,8 +15,8 @@ with open('welcome.json','r',encoding='utf8') as jfile:
 with open('command.json','r',encoding='utf8') as jfile:
     command = json.load(jfile)
 
-class Main(Cog_Extension):
-    
+
+class Player(Cog_Extension):
     @commands.command(aliases=['tm'])
     async def team(self,ctx,msg,msg2):
         online=[]
@@ -86,5 +86,7 @@ class Main(Cog_Extension):
                 json.dump(welcome,jfile)
         await ctx.send(f"✅| 已連接 離開訊息 至 {channels}")
         await member.send(f'新的離開文:\n```"{ctx.guild.id}.channel":"{int(ctx.channel.id)}","{ctx.guild.id}.text2":"{msg}"```')
+
+        
 def setup(bot):
-    bot.add_cog(Main(bot))
+    bot.add_cog(Player(bot))

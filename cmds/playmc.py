@@ -15,7 +15,7 @@ from datetime import date
 with open('setting.json','r',encoding='utf8') as jfile:
     jdata = json.load(jfile)
 
-class Main(Cog_Extension):
+class Server(Cog_Extension):
 
     @commands.command()
     async def open(self,ctx,*,msg):
@@ -106,7 +106,37 @@ class Main(Cog_Extension):
             embed.set_image(url=f"https://eu.mc-api.net/v3/server/favicon/{msg}")
             await ctx.send(embed=embed)
         else:
-            await ctx.send(f"❌| 無法連接伺服器  `{msg}`")
+            await ctx.send(f"❌ | 無法連接伺服器  `{msg}`")
+
+
+    @commands.command(aliases=['uuid','mcid','id'])
+    async def mcuuid(self,ctx,*,msg):
+        message = await ctx.send(f"🔍 | 正在查詢玩家UUID：{msg}")
+        try:
+            text = "https://api.mojang.com/users/profiles/minecraft/" + f"{msg}"
+            tryconnect = requests.get(text)
+            json_data = tryconnect.json()
+            id = json_data['id']
+            name = json_data['name']
+            embed=discord.Embed(title=f"✅ | 查詢到玩家UUID：{name}",description=f"{id}", color=0xa62b2b)
+            await message.edit(content=None,embed=embed)
+        except:
+            await message.edit(content=f"❌ | 無法查詢玩家 `{msg}`")
+    
+    @commands.command(aliases=['playskin','skin','psk'])
+    async def mcskin(self,ctx,*,msg):
+        message = await ctx.send(f"🔍 | 正在查詢玩家UUID：{msg}")
+        try:
+            text = "https://api.mojang.com/users/profiles/minecraft/" + f"{msg}"
+            tryconnect = requests.get(text)
+            json_data = tryconnect.json()
+            id = json_data['id']
+            name = json_data['name']
+            embed=discord.Embed(title=f"✅ | 查詢到玩家UUID：{name}",description=f"{id}", color=0xa62b2b)
+            await message.edit(content=None,embed=embed)
+        except:
+            await message.edit(content=f"❌ | 無法查詢玩家 `{msg}`")
+
 
 def setup(bot):
-    bot.add_cog(Main(bot))
+    bot.add_cog(Server(bot))

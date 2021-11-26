@@ -4,127 +4,106 @@ from core.classes import Cog_Extension
 import random
 import json
 import math
+
+
+from cmds.mathonly.Trigonometric import *
+from cmds.mathonly.sqrl import *
+
+
 with open('setting.json','r',encoding='utf8') as jfile:
     jdata = json.load(jfile)
 
-class React(Cog_Extension):
+reply = [['*','x','×','ｘ','＊'],
+        ['**','^','︿','＊＊'],
+        ['+','＋'],
+        ['-','－'],
+        ['/','／','÷'],
+        ['abs','fabs','ａｂｓ','ｆａｂｓ'],
+        ['sin','ｓｉｎ'],
+        ['cos','ｃｏｓ'],
+        ['tan','ｔａｎ'],
+        ['csc','ｃｓｃ'],
+        ['sec','ｓｅｃ'],
+        ['cot','ｃｏｔ'],
+        ['log','ｌｏｇ'],
+        ['sqr','ｓｑｒ','sqrt','ｓｑｒｔ'],
+        ['abs(','|','｜'],
+        ['sqr(','√']
+        ]
+
+mathid = ['sin','cos','tan','csc','sec','cot','log','abs','sqr']
+
+def calcu(text):
+    text = (text.replace('(','')).replace(')','')
+    text = eval(text)
+    return str(text)
+def get(text):
+    text = str(text)
+    while(text.find(")")!=-1):
+        count = text.find(")")
+        while(text[count]!="("):
+            count -=1
+            if(count==-1):
+                return "`❌|括弧放置錯誤`"
+        getto = text[count:text.find(")")+1]
+        turnto = calcu(getto)
+        for i in range(len(mathid)):
+            if(text[count-3:].find(mathid[i])==0):
+                if(i==0):
+                    turnto = str(sin(float(turnto)))
+                elif(i==1):
+                    turnto = str(cos(float(turnto)))
+                elif(i==2):
+                    turnto = str(tan(float(turnto)))
+                    if(turnto=="tan極端值(錯誤)"):
+                        return "`❌|tan極端值(錯誤)`"
+                elif(i==3):
+                    turnto = str(csc(float(turnto)))
+                elif(i==4):
+                    turnto = str(sec(float(turnto)))
+                elif(i==5):
+                    turnto = str(cot(float(turnto)))
+                    if(turnto=="cot極端值(錯誤)"):
+                        return "`❌|cot極端值(錯誤)`"
+                elif(i==6):
+                    turnto = str(log(turnto))
+                    if(turnto=="對數給予資料錯誤"):
+                        return "`❌|對數給予資料錯誤`"
+                elif(i==7):
+                    turnto = str(fabs(float(turnto)))
+                elif(i==8):
+                    turnto = str(sqr(float(turnto)))
+                    if(turnto == "無法計算虛數"):
+                        return "`❌|無法計算虛數`"
+                getto = mathid[i]+getto
+        text = text.replace(getto,turnto)
+    text = eval(text)
+    return str(text)
+
+
+class Math(Cog_Extension):
+    @commands.command(aliases=['math'])
+    async def calcutor(self,ctx,*,msg):
+        try:
+            Text = msg
+            for i in range(len(reply)):
+                    for j in range(1,len(reply[i])):
+                        Text = Text.replace(reply[i][j],reply[i][0])
+            await ctx.send(str("`"+msg+"`="+get(Text)))
+        except:
+            await ctx.send("❌| 計算錯誤")
     @commands.Cog.listener()
     async def on_message(self,msg):
         if msg.content.endswith('=') and msg.author != self.bot.user:
             try:
-                a = msg.content
-                e = a
-                a = a.replace('x','*')
-                for i in range(30):
-                    if "^" in a:
-                        b=""
-                        c=""
-                        d=""
-                        pos=a.find('^')
-                        c_long=0
-                        for i in range(1,30):
-                            if((a[(pos-i)])!="+" and (pos-i)>=0 and (a[(pos-i)])!="-" and (a[(pos-i)])!="*" and (a[(pos-i)])!="/"):
-                                c = a[(pos-i):(pos)]
-                                c_long+=1
-                            else:
-                                break
-                        for i in range(1,30):
-                            if(str.isdigit(a[(pos+i)])):
-                                b += a[(pos+i)]
-                            else:
-                                d = a[(pos+i):]
-                                a = a[:pos-c_long]
-                                a += ("("+c)
-                                for j in range(int(eval(b))-1):
-                                    a += ("*"+c)
-                                a += (")"+d)
-                                break
-                    else:
-                        break
-                for i in range(30):
-                    if "sin" in a:
-                        b = ""
-                        pos=a.find('sin')
-                        for i in range(30):
-                            if((a[pos+i+4])!=')'):
-                                b += a[pos+i+4]
-                            else:
-                                c = a[pos+i+5:]
-                                a = a[:pos]
-                                b = str(math.sin((math.pi/180)*eval(b)))
-                                a += b
-                                a += c
-                                break
-                    else:
-                        break
-                
-                for i in range(30):
-                    if "cos" in a:
-                        b = ""
-                        pos=a.find('cos')
-                        for i in range(30):
-                            if((a[pos+i+4])!=')'):
-                                b += a[pos+i+4]
-                            else:
-                                c = a[pos+i+5:]
-                                a = a[:pos]
-                                b = str(math.cos((math.pi/180)*eval(b)))
-                                a += b
-                                a += c
-                                break
-                    else:
-                        break
-                for i in range(30):
-                    if "tan" in a:
-                        b = ""
-                        pos=a.find('tan')
-                        for i in range(30):
-                            if((a[pos+i+4])!=')'):
-                                b += a[pos+i+4]
-                            else:
-                                c = a[pos+i+5:]
-                                a = a[:pos]
-                                b = str(math.tan((math.pi/180)*eval(b)))
-                                a += b
-                                a += c
-                                break
-                    else:
-                        break
-                a = eval(a[:(len(a)-1)])
-                a = round(a, 5)
-                await msg.channel.send(f"{e}{a}")
+                Text = msg.content
+                Text = Text[:-1]
+                for i in range(len(reply)):
+                        for j in range(1,len(reply[i])):
+                            Text = Text.replace(reply[i][j],reply[i][0])
+                await msg.channel.send(str(msg.content+get(Text)))
             except:
                 await msg.channel.send("❌| 計算錯誤")
-        if msg.content.startswith('addbot') and msg.author != self.bot.user:
-            guild = self.bot.get_guild(871573666637426738) 
-            autor = guild.get_member(561731559493861398)
-            a = msg.content
-            author = msg.author
-            guild = msg.guild
-            a = a.replace('add','')
-            await msg.channel.send(f"✅| 已向 {autor} 發出請求{a} 至 {guild}")
-            embed=discord.Embed(title="請求", description=f"`{author}`請求在`{guild}`邀請`{a}`", color=0xff6842)
-            await autor.send(embed=embed)
-        if msg.content.startswith('talkauthor') and msg.author != self.bot.user:
-            guild = self.bot.get_guild(871573666637426738) 
-            autor = guild.get_member(561731559493861398)
-            a = msg.content
-            author = msg.author
-            guild = msg.guild
-            a = a.replace('talkauthor','')
-            await msg.channel.send(f"✅| 已轉達 {autor} `{a}`")
-            embed=discord.Embed(title="轉達", description=f"{author}：`{a}`", color=0xff6842)
-            await autor.send(embed=embed)
-        if msg.content.startswith('getpart') and msg.author != self.bot.user:
-            guild = self.bot.get_guild(871573666637426738) 
-            autor = guild.get_member(561731559493861398)
-            a = msg.content
-            author = msg.author
-            guild = msg.guild
-            a = a.replace('getpart','')
-            await msg.channel.send(f"✅| 已請求 `{autor}` 審核 `{author}` 加入`{a}`身分組")
-            embed=discord.Embed(title="身分組請求", description=f"`{author}`：請求於 `{guild}` 更改身分組 `{a}`", color=0xff6842)
-            await autor.send(embed=embed)
 
 def setup(bot):
-    bot.add_cog(React(bot))
+    bot.add_cog(Math(bot))
